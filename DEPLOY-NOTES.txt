@@ -1,0 +1,13 @@
+DPL DEPLOYMENT NOTES
+
+Static site root: public/
+Supabase project ref: mpxrzpicbbglpsvzyeih
+Supabase URL: https://mpxrzpicbbglpsvzyeih.supabase.co
+Browser key: publishable key is in public/config.js (public by design)
+NEVER add a service_role / sb_secret key to public/config.js or GitHub.
+
+Run SQL migration first: supabase/migrations/001_dpl_finish_setup.sql
+Deploy public Edge Functions with --no-verify-jwt: submit-registration, registration-status, public-players
+Deploy admin Edge Functions with JWT verification ON: admin-list, admin-review
+
+The user must set Supabase Auth Site URL and Redirect URLs after the final website URL is known.
