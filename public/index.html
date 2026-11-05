@@ -25,4 +25,19 @@
 <div class="modal" id="adminModal"><div class="modal-card admin-modal"><button class="x" data-close="adminModal">×</button><div id="adminLogin"><span class="kicker">RESTRICTED AREA</span><h2>DPL <em>ADMIN LOGIN</em></h2><form id="loginForm"><label>Email<input name="email" type="email" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required></label><button class="btn gold full">LOGIN TO DASHBOARD</button></form><p class="fineprint">Only authorized DPL administrators can access this panel.</p></div><div id="adminDashboard" hidden><div class="admin-head"><div><span class="kicker">CONTROL ROOM</span><h2>ADMIN <em>DASHBOARD</em></h2></div><button id="logoutBtn" class="btn outline">LOG OUT</button></div><div class="admin-stats"><div><b id="adminTotal">0</b><small>CONFIRMED</small></div><div><b id="adminPending">0</b><small>PENDING</small></div><div><b id="adminCollection">₹0</b><small>APPROVED FEES</small></div></div><div class="admin-tools"><h3>REGISTRATION REQUESTS</h3><button class="btn outline" id="exportBtn">DOWNLOAD CSV</button></div><div id="adminList" class="admin-list">Loading…</div></div></div></div>
 <div class="modal" id="cardModal"><div class="modal-card card-modal"><button class="x" data-close="cardModal">×</button><div id="playerCard" class="player-card"></div><button id="downloadCard" class="btn gold full">DOWNLOAD PLAYER CARD ↓</button></div></div>
 <div class="toast" id="toast" role="status"></div>
+<script>
+window.addEventListener('error', function(e) {
+  const box = document.createElement('div');
+  box.style = 'position:fixed;bottom:10px;left:10px;right:10px;background:#7f0000;color:white;padding:15px;z-index:999999;font-size:14px;overflow-wrap:anywhere;';
+  box.textContent = 'DPL ERROR: ' + (e.message || e.target.src || 'Unknown error');
+  document.body.appendChild(box);
+});
+
+window.addEventListener('unhandledrejection', function(e) {
+  const box = document.createElement('div');
+  box.style = 'position:fixed;bottom:10px;left:10px;right:10px;background:#7f0000;color:white;padding:15px;z-index:999999;font-size:14px;overflow-wrap:anywhere;';
+  box.textContent = 'DPL ERROR: ' + (e.reason?.message || String(e.reason));
+  document.body.appendChild(box);
+});
+</script>
 </body></html>
