@@ -1,5 +1,5 @@
 const cfg=window.DPL_CONFIG;
-const supabase=window.supabase.createClient(cfg.supabaseUrl,cfg.publishableKey);
+const const dplClient=window.supabase.createClient(cfg.supabaseUrl,cfg.publishableKey);
 const $=s=>document.querySelector(s);
 let draft=null, currentPlayers=[];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
