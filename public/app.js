@@ -361,4 +361,290 @@ $('#statusForm').addEventListener('submit', async e => {
   box.textContent = 'Checking…';
 
   try {
-    const { data, error } = await d
+    const { data, error } = await dplClient.functions.invoke(
+      'registration-status', { body: { request_id: id } }
+    );
+
+    if (error) throw error;
+    if (data.error) throw Error(data.error);
+
+    box.innerHTML = `
+      <b>${esc(data.first_name)} ${esc(data.last_name)}</b> • ${esc(data.player_type)}
+      <br>Status: <b>${esc(data.status.toUpperCase())}</b>
+      ${data.registration_number
+        ? `<br><span class="success">Registration No: ${esc(data.registration_number)}</span>`
+        : ''}
+    `;
+
+    if (data.registration_number) {
+      const p = currentPlayers.find(
+        x => x.registration_number === data.registration_number
+      );
+
+      if (p) {
+        const btn = document.createElement('button');
+        btn.className = 'btn gold';
+        btn.style.marginTop = '10px';
+        btn.textContent = 'VIEW PLAYER CARD';
+        btn.onclick = () => openCard(p);
+        box.appendChild(document.createElement('br'));
+        box.appendChild(btn);
+      }
+    }
+
+  } catch (err) {
+    box.textContent = err.message || 'Could not find registration.';
+  }
+});
+
+function openCard(p) {
+  $('#playerCard').innerHTML = `
+    <img class="card-logo" src="assets/dpl-logo.png" alt="DPL">
+    <h3>DEBODIH PREMIER LEAGUE</h3>
+    <img class="card-photo" src="${esc(p.photo_url || '')}" alt="Player photo">
+    <div class="card-name">${esc(p.first_name)} ${esc(p.last_name)}</div>
+    <div class="card-type">${esc(p.player_type)}</div>
+    <div class="card-reg">${esc(p.registration_number)}</div>
+    <span class="confirmed">CONFIRMED PLAYER</span>
+  `;
+
+  show('cardModal');
+}
+
+$('#downloadCard').addEventListener('click', async () => {
+  const card = $('#playerCard');
+  const photo = card.querySelector('.card-photo');
+  const logo = card.querySelector('.card-logo');
+
+  const c = document.createElement('canvas');
+  c.width = 900;
+  c.height = 1100;
+
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 900, 1100);
+
+  g.addColorStop(0, '#071a31');
+  g.addColorStop(1, '#17466b');
+
+  x.fillStyle = g;
+  x.fillRect(0, 0, 900, 1100);
+  x.strokeStyle = '#e8b94f';
+  x.lineWidth = 12;
+  x.strokeRect(22, 22, 856, 1056);
+
+  try {
+    x.drawImage(logo, 380, 55, 140, 140);
+    x.drawImage(photo, 345, 270, 210, 230);
+  } catch {
+    return toast('Player photo could not be loaded. Reopen the card and try again.');
+  }
+
+  x.textAlign = 'center';
+  x.fillStyle = '#e8b94f';
+  x.font = 'bold 42px Arial';
+  x.fillText('DEBODIH PREMIER LEAGUE', 450, 245);
+
+  x.fillStyle = '#fff';
+  x.font = 'bold 52px Arial';
+
+  let n = card.querySelector('.card-name').textContent;
+  if (n.length > 24) n = n.slice(0, 24);
+
+  x.fillText(n, 450, 590);
+  x.fillStyle = '#d4dfec';
+  x.font = '32px Arial';
+  x.fillText(card.querySelector('.card-type').textContent, 450, 655);
+
+  x.fillStyle = '#e8b94f';
+  x.font = 'bold 58px Arial';
+  x.fillText(card.querySelector('.card-reg').textContent, 450, 770);
+
+  x.fillRect(275, 835, 350, 70);
+  x.fillStyle = '#071a31';
+  x.font = 'bold 29px Arial';
+  x.fillText('CONFIRMED PLAYER', 450, 880);
+
+  const a = document.createElement('a');
+  a.download = 'DPL-Player-Card.png';
+  a.href = c.toDataURL('image/png');
+  a.click();
+});
+
+$('#adminOpen').onclick = $('#footerAdmin').onclick = () => {
+  show('adminModal');
+};
+
+$('#loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const f = e.currentTarget;
+  const btn = f.querySelector('button');
+  btn.disabled = true;
+
+  try {
+    const { error } = await dplClient.auth.signInWithPassword({
+      email: f.elements.namedItem('email').value,
+      password: f.elements.namedItem('password').value
+    });
+
+    if (error) throw error;
+
+    $('#adminLogin').hidden = true;
+    $('#adminDashboard').hidden = false;
+    await loadAdmin();
+
+  } catch (err) {
+    toast(err.message || 'Login failed.');
+
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+async function loadAdmin() {
+  const box = $('#adminList');
+  box.textContent = 'Loading registrations…';
+
+  try {
+    const { data, error } = await dplClient.functions.invoke(
+      'admin-list', { body: {} }
+    );
+
+    if (error) throw error;
+    if (data.error) throw Error(data.error);
+
+    $('#adminTotal').textContent = data.approved;
+    $('#adminPending').textContent = data.pending;
+    $('#adminCollection').textContent = '₹' + data.collected;
+
+    box.innerHTML = '';
+
+    if (!data.registrations.length) {
+      box.textContent = 'No registrations yet.';
+      return;
+    }
+
+    data.registrations.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'admin-row';
+
+      row.innerHTML = `
+        <div>
+          <b>${esc(r.first_name)} ${esc(r.last_name)}</b><br>
+          <small>${esc(r.player_type)} • ${new Date(r.created_at).toLocaleString()}</small>
+          <div class="proofs">
+            <a href="${esc(r.photo_url || '#')}" target="_blank" rel="noopener">
+              <img src="${esc(r.photo_url || '')}" alt="Player photo">
+            </a>
+            <a href="${esc(r.payment_url || '#')}" target="_blank" rel="noopener">
+              <img src="${esc(r.payment_url || '')}" alt="Payment proof">
+            </a>
+          </div>
+          <small>Status: <b>${esc(r.status.toUpperCase())}</b> ${r.registration_number ? '• ' + esc(r.registration_number) : ''}</small>
+        </div>
+        <div class="actions">
+          ${r.status === 'pending'
+            ? `<button class="btn approve" data-approve="${esc(r.id)}">APPROVE</button>
+               <button class="btn reject" data-reject="${esc(r.id)}">REJECT</button>`
+            : ''}
+        </div>
+      `;
+
+      box.appendChild(row);
+    });
+
+    box.querySelectorAll('[data-approve]').forEach(b =>
+      b.onclick = () => review(b.dataset.approve, 'approve')
+    );
+
+    box.querySelectorAll('[data-reject]').forEach(b =>
+      b.onclick = () => review(b.dataset.reject, 'reject')
+    );
+
+  } catch (err) {
+    box.textContent = err.message || 'Admin list could not load.';
+  }
+}
+
+async function review(id, action) {
+  const msg = action === 'approve'
+    ? 'Have you personally confirmed receipt of exactly ₹199 in your PhonePe/UPI account? Only approve after checking the actual transaction.'
+    : 'Reject this pending registration?';
+
+  if (!confirm(msg)) return;
+
+  try {
+    const { data, error } = await dplClient.functions.invoke(
+      'admin-review', { body: { player_id: id, action } }
+    );
+
+    if (error) throw error;
+    if (data.error) throw Error(data.error);
+
+    toast(action === 'approve'
+      ? 'Approved: ' + data.registration_number
+      : 'Registration rejected');
+
+    await loadAdmin();
+    await loadPlayers();
+
+  } catch (err) {
+    toast(err.message || 'Review failed');
+  }
+}
+
+$('#logoutBtn').onclick = async () => {
+  await dplClient.auth.signOut();
+  $('#adminLogin').hidden = false;
+  $('#adminDashboard').hidden = true;
+  $('#loginForm').reset();
+};
+
+$('#exportBtn').onclick = async () => {
+  try {
+    const { data, error } = await dplClient.functions.invoke(
+      'admin-list', { body: {} }
+    );
+
+    if (error) throw error;
+
+    const cols = [
+      'id', 'first_name', 'last_name', 'player_type',
+      'status', 'registration_number', 'created_at'
+    ];
+
+    const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+
+    const csv = [
+      cols.join(','),
+      ...(data.registrations || []).map(r =>
+        cols.map(k => q(r[k])).join(',')
+      )
+    ].join('\n');
+
+    const url = URL.createObjectURL(
+      new Blob([csv], { type: 'text/csv' })
+    );
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'DPL-registrations.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+
+  } catch (e) {
+    toast(e.message);
+  }
+};
+
+(async () => {
+  const { data } = await dplClient.auth.getSession();
+
+  if (data.session) {
+    $('#adminLogin').hidden = true;
+    $('#adminDashboard').hidden = false;
+    loadAdmin();
+  }
+
+  loadPlayers();
+})();
