@@ -24,15 +24,15 @@ jobs:
 
       - name: Deploy public functions
         run: |
-          supabase functions deploy submit-registration --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
-          supabase functions deploy public-players --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
-          supabase functions deploy registration-status --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+          supabase functions deploy submit-registration --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --yes
+          supabase functions deploy public-players --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --yes
+          supabase functions deploy registration-status --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --yes
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Deploy admin functions
         run: |
-          supabase functions deploy admin-list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
-          supabase functions deploy admin-review --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+          supabase functions deploy admin-list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --yes
+          supabase functions deploy admin-review --project-ref ${{ secrets.SUPABASE_PROJECT_ID }} --yes
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
