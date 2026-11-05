@@ -7,8 +7,8 @@ Deno.serve(async (req) => {
     if (error) throw error;
     const rows = await Promise.all((data || []).map(async (p) => {
       const [photo, payment] = await Promise.all([
-        admin.storage.from('player-photos').createSignedUrl(p.photo_path, 60 * 10),
-        admin.storage.from('payment-screenshots').createSignedUrl(p.payment_screenshot_path, 60 * 10),
+        admin.storage.from('player photos').createSignedUrl(p.photo_path, 60 * 10),
+        admin.storage.from('payment screenshots').createSignedUrl(p.payment_screenshot_path, 60 * 10),
       ]);
       return { ...p, photo_url: photo.data?.signedUrl || null, payment_url: payment.data?.signedUrl || null };
     }));
