@@ -1,33 +1,38 @@
 name: Deploy DPL Edge Functions
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'supabase/functions/**'
-      - '.github/workflows/deploy.yml'
-  workflow_dispatch:
+push:
+branches:
+- main
+paths:
+- 'supabase/functions/**'
+- '.github/workflows/deploy.yml'
+workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+deploy:
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
 
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
+  - name: Setup Supabase CLI
+    uses: supabase/setup-cli@v1
+    with:
+      version: latest
 
-      - name: Deploy Edge Functions
-        run: |
-          supabase functions deploy submit-registration --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
-          supabase functions deploy public-players --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
-          supabase functions deploy registration-status --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
-          supabase functions deploy admin-list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
-          supabase functions deploy admin-review --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  - name: Deploy public functions
+    run: |
+      supabase functions deploy submit-registration --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+      supabase functions deploy public-players --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+      supabase functions deploy registration-status --no-verify-jwt --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+  - name: Deploy admin functions
+    run: |
+      supabase functions deploy admin-list --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+      supabase functions deploy admin-review --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
