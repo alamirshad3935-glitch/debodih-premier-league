@@ -27,8 +27,12 @@ Deno.serve(async (req) => {
         ? body.last_name.trim()
         : '';
 
-    const player_type = body.player_type;
+    const mobile_number =
+      typeof body.mobile_number === 'string'
+        ? body.mobile_number.trim()
+        : '';
 
+    const player_type = body.player_type;
     const photo_path = body.photo_path;
     const payment_screenshot_path =
       body.payment_screenshot_path;
@@ -48,13 +52,7 @@ Deno.serve(async (req) => {
       !allowed.includes(player_type)
     ) {
       return json({
-        error: 'Player details validation failed.',
-        received: {
-          first_name_received: !!first_name,
-          last_name_received: !!last_name,
-          player_type_received: player_type ?? null,
-          allowed_player_types: allowed
-        }
+        error: 'Player details validation failed.'
       }, 400);
     }
 
@@ -64,7 +62,14 @@ Deno.serve(async (req) => {
       }, 400);
     }
 
-    // 3. Validate upload paths
+    // 3. Validate mobile number
+    if (!/^[0-9]{10}$/.test(mobile_number)) {
+      return json({
+        error: 'Please enter a valid 10-digit mobile number.'
+      }, 400);
+    }
+
+    // 4. Validate upload paths
     if (
       typeof photo_path !== 'string' ||
       typeof payment_screenshot_path !== 'string' ||
@@ -76,10 +81,10 @@ Deno.serve(async (req) => {
       }, 400);
     }
 
-    // 4. Create secure server client
+    // 5. Create secure server client
     const admin = serviceClient();
 
-    // 5. Check payment screenshot
+    // 6. Check payment screenshot
     const {
       data: payment,
       error: downloadError
@@ -98,14 +103,14 @@ Deno.serve(async (req) => {
       }, 400);
     }
 
-    // 6. Check file size
+    // 7. Check file size
     if (payment.size > 5 * 1024 * 1024) {
       return json({
         error: 'Payment screenshot must be 5 MB or smaller.'
       }, 400);
     }
 
-    // 7. Calculate SHA-256 hash
+    // 8. Calculate SHA-256 hash
     const bytes = new Uint8Array(
       await payment.arrayBuffer()
     );
@@ -119,7 +124,7 @@ Deno.serve(async (req) => {
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
 
-    // 8. Check duplicate payment screenshot
+    // 9. Check duplicate payment screenshot
     const {
       data: duplicate,
       error: duplicateError
@@ -144,7 +149,7 @@ Deno.serve(async (req) => {
       }, 409);
     }
 
-    // 9. Insert registration
+    // 10. Insert registration including mobile number
     const {
       data,
       error: insertError
@@ -153,6 +158,7 @@ Deno.serve(async (req) => {
       .insert({
         first_name,
         last_name,
+        mobile_number,
         player_type,
         photo_path,
         payment_screenshot_path,
@@ -173,7 +179,7 @@ Deno.serve(async (req) => {
       throw insertError;
     }
 
-    // 10. Success response
+    // 11. Success response
     return json({
       ok: true,
       request_id: data.id,
