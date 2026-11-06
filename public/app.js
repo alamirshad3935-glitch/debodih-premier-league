@@ -221,6 +221,7 @@ $('#paymentFile').addEventListener('change', e => {
   $('#paymentName').textContent = e.target.files[0]?.name || 'Choose screenshot';
 });
 
+// PLAYER REGISTRATION FORM
 $('#regForm').addEventListener('submit', e => {
   e.preventDefault();
 
@@ -228,6 +229,11 @@ $('#regForm').addEventListener('submit', e => {
   if (!f.reportValidity()) return;
 
   const photo = $('#playerPhoto').files[0];
+  const mobile = f.elements.namedItem('mobile_number').value.trim();
+
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    return toast('कृपया सही 10 अंकों का मोबाइल नंबर डालें।');
+  }
 
   if (!fileOk(photo)) {
     return toast('Player photo must be JPG, PNG or WEBP under 5 MB.');
@@ -236,6 +242,7 @@ $('#regForm').addEventListener('submit', e => {
   draft = {
     first_name: f.elements.namedItem('first_name').value.trim(),
     last_name: f.elements.namedItem('last_name').value.trim(),
+    mobile_number: mobile,
     player_type: f.elements.namedItem('player_type').value,
     photo
   };
@@ -246,6 +253,7 @@ $('#regForm').addEventListener('submit', e => {
   show('paymentModal');
 });
 
+// PAYMENT AND REGISTRATION SUBMISSION
 $('#paymentForm').addEventListener('submit', async e => {
   e.preventDefault();
   if (!draft) return;
@@ -261,10 +269,11 @@ $('#paymentForm').addEventListener('submit', async e => {
   btn.textContent = 'UPLOADING…';
 
   let photoPath = null;
+  let paymentPath = null;
 
   try {
     photoPath = await upload('Player photo', draft.photo);
-    const paymentPath = await upload('Payment screenshot', payment);
+    paymentPath = await upload('Payment screenshot', payment);
 
     const { data, error } = await dplClient.functions.invoke(
       'submit-registration',
@@ -272,6 +281,7 @@ $('#paymentForm').addEventListener('submit', async e => {
         body: {
           first_name: draft.first_name,
           last_name: draft.last_name,
+          mobile_number: draft.mobile_number,
           player_type: draft.player_type,
           photo_path: photoPath,
           payment_screenshot_path: paymentPath
@@ -284,21 +294,26 @@ $('#paymentForm').addEventListener('submit', async e => {
 
     $('#paymentMessage').innerHTML = `
       <div class="success">
-        <b>Registration submitted!</b>
-        <p>Your private request code:</p>
-        <p style="overflow-wrap:anywhere"><b>${esc(data.request_id)}</b></p>
-        <p>Status: PENDING. Save this code. Your DPL registration number will be issued only after the admin verifies the ₹199 payment in PhonePe.</p>
+        <b>Registration submitted successfully!</b>
+        <p>Your application status is now: <b>PENDING</b></p>
+        <p>आप अपने रजिस्टर्ड मोबाइल नंबर से कभी भी Registration Status चेक कर सकते हैं।</p>
+        <p>DPL Registration Number केवल ₹199 का भुगतान सत्यापित होने के बाद जारी होगा।</p>
       </div>
     `;
 
     $('#regForm').reset();
     $('#photoName').textContent = 'Choose photo';
     draft = null;
+
     toast('Registration submitted successfully.');
 
   } catch (err) {
     if (photoPath) {
       await dplClient.storage.from('Player photo').remove([photoPath]);
+    }
+
+    if (paymentPath) {
+      await dplClient.storage.from('Payment screenshot').remove([paymentPath]);
     }
 
     $('#paymentMessage').innerHTML =
@@ -310,6 +325,7 @@ $('#paymentForm').addEventListener('submit', async e => {
   }
 });
 
+// LOAD PUBLIC APPROVED PLAYERS
 async function loadPlayers() {
   const box = $('#playersGrid');
 
@@ -353,51 +369,133 @@ async function loadPlayers() {
   }
 }
 
+// CHECK REGISTRATION STATUS USING MOBILE NUMBER
 $('#statusForm').addEventListener('submit', async e => {
   e.preventDefault();
 
-  const id = e.currentTarget.elements.namedItem('request_id').value.trim();
+  const form = e.currentTarget;
+  const mobile = form.elements.namedItem('mobile_number').value.trim();
   const box = $('#statusResult');
-  box.textContent = 'Checking…';
+  const button = form.querySelector('button');
+
+  if (!/^[0-9]{10}$/.test(mobile)) {
+    box.textContent = 'कृपया सही 10 अंकों का मोबाइल नंबर डालें।';
+    return;
+  }
+
+  box.textContent = 'Checking registration status…';
+  button.disabled = true;
 
   try {
     const { data, error } = await dplClient.functions.invoke(
-      'registration-status', { body: { request_id: id } }
+      'registration-status',
+      {
+        body: { mobile_number: mobile }
+      }
     );
 
     if (error) throw error;
-    if (data.error) throw Error(data.error);
+    if (data?.error) throw Error(data.error);
 
-    box.innerHTML = `
-      <b>${esc(data.first_name)} ${esc(data.last_name)}</b> • ${esc(data.player_type)}
-      <br>Status: <b>${esc(data.status.toUpperCase())}</b>
-      ${data.registration_number
-        ? `<br><span class="success">Registration No: ${esc(data.registration_number)}</span>`
-        : ''}
-    `;
+    const results = Array.isArray(data?.registrations)
+      ? data.registrations
+      : data?.registration
+        ? [data.registration]
+        : data?.status
+          ? [data]
+          : [];
 
-    if (data.registration_number) {
-      const p = currentPlayers.find(
-        x => x.registration_number === data.registration_number
-      );
+    if (!results.length) {
+      box.innerHTML = `
+        <div class="error">
+          इस मोबाइल नंबर से कोई रजिस्ट्रेशन नहीं मिला।
+          कृपया वही नंबर डालें जो रजिस्ट्रेशन फॉर्म में दिया था।
+        </div>
+      `;
+      return;
+    }
 
-      if (p) {
+    box.innerHTML = '';
+
+    results.forEach(p => {
+      const status = String(p.status || '').toLowerCase();
+      const card = document.createElement('div');
+
+      card.style.cssText = `
+        background:#f5f7fa;
+        border:1px solid #ddd;
+        border-radius:10px;
+        padding:14px;
+        margin-top:12px;
+        color:#071a31;
+      `;
+
+      let statusText = 'PENDING';
+      let statusColor = '#b7791f';
+
+      if (status === 'approved') {
+        statusText = 'APPROVED';
+        statusColor = '#16803c';
+      } else if (status === 'rejected') {
+        statusText = 'REJECTED';
+        statusColor = '#c53030';
+      }
+
+      card.innerHTML = `
+        <b>${esc(p.first_name)} ${esc(p.last_name)}</b>
+        <br>
+        <span>${esc(p.player_type || '')}</span>
+        <br>
+        Status:
+        <b style="color:${statusColor}">${statusText}</b>
+        ${
+          p.registration_number
+            ? `<br>Registration No: <b>${esc(p.registration_number)}</b>`
+            : ''
+        }
+        ${
+          status === 'pending'
+            ? '<p>आपका भुगतान और रजिस्ट्रेशन अभी जाँच के अधीन है।</p>'
+            : ''
+        }
+        ${
+          status === 'rejected'
+            ? '<p>आपका रजिस्ट्रेशन स्वीकार नहीं हुआ। अधिक जानकारी के लिए DPL Admin से संपर्क करें।</p>'
+            : ''
+        }
+      `;
+
+      if (status === 'approved' && p.registration_number && p.photo_url) {
         const btn = document.createElement('button');
         btn.className = 'btn gold';
         btn.style.marginTop = '10px';
         btn.textContent = 'VIEW PLAYER CARD';
+
         btn.onclick = () => openCard(p);
-        box.appendChild(document.createElement('br'));
-        box.appendChild(btn);
+
+        card.appendChild(document.createElement('br'));
+        card.appendChild(btn);
       }
-    }
+
+      box.appendChild(card);
+    });
 
   } catch (err) {
-    box.textContent = err.message || 'Could not find registration.';
+    console.error('Status check error:', err);
+    box.textContent = err.message || 'Status check नहीं हो पाया। कृपया दोबारा कोशिश करें।';
+
+  } finally {
+    button.disabled = false;
   }
 });
 
+// PLAYER CARD
 function openCard(p) {
+  if (!p || !p.registration_number) {
+    toast('Player card अभी उपलब्ध नहीं है।');
+    return;
+  }
+
   $('#playerCard').innerHTML = `
     <img class="card-logo" src="assets/dpl-logo.png" alt="DPL">
     <h3>DEBODIH PREMIER LEAGUE</h3>
@@ -411,6 +509,7 @@ function openCard(p) {
   show('cardModal');
 }
 
+// DOWNLOAD PLAYER CARD
 $('#downloadCard').addEventListener('click', async () => {
   const card = $('#playerCard');
   const photo = card.querySelector('.card-photo');
@@ -433,10 +532,25 @@ $('#downloadCard').addEventListener('click', async () => {
   x.strokeRect(22, 22, 856, 1056);
 
   try {
+    if (!photo.complete || !photo.naturalWidth) {
+      await new Promise((resolve, reject) => {
+        photo.onload = resolve;
+        photo.onerror = reject;
+      });
+    }
+
+    if (!logo.complete || !logo.naturalWidth) {
+      await new Promise((resolve, reject) => {
+        logo.onload = resolve;
+        logo.onerror = reject;
+      });
+    }
+
     x.drawImage(logo, 380, 55, 140, 140);
     x.drawImage(photo, 345, 270, 210, 230);
+
   } catch {
-    return toast('Player photo could not be loaded. Reopen the card and try again.');
+    return toast('Player photo या DPL logo load नहीं हुआ। दोबारा कोशिश करें।');
   }
 
   x.textAlign = 'center';
@@ -451,6 +565,7 @@ $('#downloadCard').addEventListener('click', async () => {
   if (n.length > 24) n = n.slice(0, 24);
 
   x.fillText(n, 450, 590);
+
   x.fillStyle = '#d4dfec';
   x.font = '32px Arial';
   x.fillText(card.querySelector('.card-type').textContent, 450, 655);
@@ -464,16 +579,22 @@ $('#downloadCard').addEventListener('click', async () => {
   x.font = 'bold 29px Arial';
   x.fillText('CONFIRMED PLAYER', 450, 880);
 
-  const a = document.createElement('a');
-  a.download = 'DPL-Player-Card.png';
-  a.href = c.toDataURL('image/png');
-  a.click();
+  try {
+    const a = document.createElement('a');
+    a.download = 'DPL-Player-Card.png';
+    a.href = c.toDataURL('image/png');
+    a.click();
+  } catch (err) {
+    toast('Card download नहीं हो पाया। फोटो URL की अनुमति जाँचनी होगी।');
+  }
 });
 
+// ADMIN MODAL
 $('#adminOpen').onclick = $('#footerAdmin').onclick = () => {
   show('adminModal');
 };
 
+// ADMIN LOGIN
 $('#loginForm').addEventListener('submit', async e => {
   e.preventDefault();
 
@@ -501,6 +622,7 @@ $('#loginForm').addEventListener('submit', async e => {
   }
 });
 
+// LOAD ADMIN DASHBOARD
 async function loadAdmin() {
   const box = $('#adminList');
   box.textContent = 'Loading registrations…';
@@ -566,6 +688,7 @@ async function loadAdmin() {
   }
 }
 
+// APPROVE / REJECT
 async function review(id, action) {
   const msg = action === 'approve'
     ? 'Have you personally confirmed receipt of exactly ₹199 in your PhonePe/UPI account? Only approve after checking the actual transaction.'
@@ -593,6 +716,7 @@ async function review(id, action) {
   }
 }
 
+// ADMIN LOGOUT
 $('#logoutBtn').onclick = async () => {
   await dplClient.auth.signOut();
   $('#adminLogin').hidden = false;
@@ -600,6 +724,7 @@ $('#logoutBtn').onclick = async () => {
   $('#loginForm').reset();
 };
 
+// EXPORT CSV
 $('#exportBtn').onclick = async () => {
   try {
     const { data, error } = await dplClient.functions.invoke(
@@ -637,6 +762,7 @@ $('#exportBtn').onclick = async () => {
   }
 };
 
+// INITIAL LOAD
 (async () => {
   const { data } = await dplClient.auth.getSession();
 
