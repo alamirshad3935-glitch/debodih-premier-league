@@ -1,18 +1,25 @@
 <!doctype html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#071a31">
 <meta name="description" content="Debodih Premier League — player registration and tournament updates.">
-<title>Debodih Premier League | DPL</title><link rel="preconnect" href="https://fonts.googleapis.com">
+<title>Debodih Premier League | DPL</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=4">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css?v=4">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script defer src="app.js"></script>
-</head><body><a href="https://chat.whatsapp.com/JS80xbfm6Yw1yurFmxZVmc?s=cl&p=a&iam=2"
+</head>
+
+<body>
+
+<a href="https://chat.whatsapp.com/JS80xbfm6Yw1yurFmxZVmc?s=cl&p=a&iam=2"
 target="_blank" rel="noopener noreferrer"
 style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:9px 12px;background:#25D366;color:#073b20;text-decoration:none;text-align:center;font-family:Inter,sans-serif;font-size:12px;font-weight:800;box-sizing:border-box;">
 <span>☏</span>
@@ -25,53 +32,81 @@ style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%
 <img src="assets/dpl-logo.png" alt="DPL logo">
 <span>DEBODIH <b>PREMIER LEAGUE</b><small>CRICKET • COMMUNITY • GLORY</small></span>
 </a>
+
 <nav>
 <a href="#players">Players</a>
 <a href="#status">Check Status</a>
 <a href="#support">Help & Support</a>
 <button class="nav-admin" id="adminOpen">Admin Login</button>
 </nav>
-</header><main id="home"><section class="hero">
+</header>
+
+<main id="home">
+
+<section class="hero">
 <div class="hero-shade"></div>
+
 <div class="hero-content">
 <div class="eyebrow"><i></i> THE BIGGEST CRICKET CELEBRATION IN DEBODIH</div>
+
 <h1>ONE VILLAGE.<br><em>ONE LEAGUE.</em><br>ONE CHAMPION.</h1>
-<p>Talent gets the chance. Passion makes history. Be part of Debodih Premier League.</p><div class="hero-actions">
+
+<p>Talent gets the chance. Passion makes history. Be part of Debodih Premier League.</p>
+
+<div class="hero-actions">
 <a class="btn gold" href="#register">REGISTER NOW <span>→</span></a>
 <a class="text-link" href="#players">View confirmed players</a>
-</div><div class="hero-stats">
+</div>
+
+<div class="hero-stats">
 <div><strong id="playerCount">—</strong><span>CONFIRMED PLAYERS</span></div>
 <div><strong>₹199</strong><span>REGISTRATION FEE</span></div>
 <div><strong>DPL</strong><span>DEBODIH, JHARKHAND</span></div>
 </div>
 </div>
+
 <div class="hero-mark">DPL<span>20<span>26</span></span></div>
-</section><section class="ticker">
+</section>
+
+<section class="ticker">
 <span>DEBODIH PREMIER LEAGUE</span><b>✦</b>
 <span>REGISTER • PLAY • WIN</span><b>✦</b>
 <span>CRICKET FOR GLORY</span>
-</section><section class="section register-section" id="register">
+</section>
+
+<section class="section register-section" id="register">
+
 <div class="section-head">
 <div>
 <span class="kicker">YOUR JOURNEY STARTS HERE</span>
 <h2>PLAYER <em>REGISTRATION</em></h2>
 </div>
 <p>Fill in your details and complete the ₹199 registration payment.</p>
-</div><div class="register-grid"><form id="regForm" class="panel form-panel">
+</div>
+
+<div class="register-grid">
+
+<form id="regForm" class="panel form-panel">
+
 <div class="panel-title">
 <span class="step">01</span>
 <div>
 <h3>PLAYER DETAILS</h3>
 <small>Enter your name exactly as you want it on your player card.</small>
 </div>
-</div><div class="two-col">
+</div>
+
+<div class="two-col">
 <label>First Name
 <input name="first_name" required maxlength="60" placeholder="e.g. Shahid">
 </label>
+
 <label>Last Name / Surname
 <input name="last_name" required maxlength="60" placeholder="e.g. Azmi">
 </label>
-</div><label>Mobile Number
+</div>
+
+<label>Mobile Number
 <input
 name="mobile_number"
 type="tel"
@@ -81,50 +116,67 @@ maxlength="10"
 minlength="10"
 placeholder="Enter 10-digit mobile number"
 required
+>
+</label>
 
-«»
-
-</label><label>Player Type
+<label>Player Type
 <select name="player_type" required>
-
 <option value="">Select your role</option>
 <option>Batsman</option>
 <option>Bowler</option>
 <option>All-Rounder</option>
 <option>Wicket Keeper</option>
 </select>
-</label><label class="upload-box">
+</label>
+
+<label class="upload-box">
 <span class="upload-icon">＋</span>
 <b>Upload Player Photo</b>
 <small>JPG, PNG or WEBP • Maximum 5 MB</small>
 <input id="playerPhoto" type="file" accept="image/jpeg,image/png,image/webp" required>
 <span id="photoName" class="file-name">Choose photo</span>
-</label><button class="btn gold full" type="submit">CONTINUE TO PAYMENT <span>→</span></button>
+</label>
+
+<button class="btn gold full" type="submit">CONTINUE TO PAYMENT <span>→</span></button>
 
 <p class="fineprint">Your registration remains pending until the DPL admin verifies your payment.</p>
-</form><div class="payment-card">
+</form>
+
+<div class="payment-card">
 <div class="payment-top">
 <span class="kicker">REGISTRATION FEE</span>
 <div class="fee">₹199 <small>ONE TIME</small></div>
 <p>Scan the QR code using PhonePe or any UPI app.</p>
-</div><div class="qr-wrap">
+</div>
+
+<div class="qr-wrap">
 <img src="assets/phonepe-qr.png" alt="DPL PhonePe payment QR">
-</div><div class="upi-line">
+</div>
+
+<div class="upi-line">
 <small>UPI ID</small>
 <b>8252642021-3@axl</b>
-</div><div class="pay-note">
+</div>
+
+<div class="pay-note">
 <b>IMPORTANT</b>
 <span>Pay exactly ₹199 and upload the payment screenshot on the next step. Your DPL number is issued only after admin approval.</span>
 </div>
 </div>
+
 </div>
-</section><section class="section status-section" id="status">
+</section>
+
+<section class="section status-section" id="status">
 <div class="status-box">
+
 <div>
 <span class="kicker">ALREADY REGISTERED?</span>
 <h2>CHECK YOUR <em>STATUS</em></h2>
 <p>Enter your registered mobile number to check your application status.</p>
-</div><form id="statusForm">
+</div>
+
+<form id="statusForm">
 <input
 name="mobile_number"
 type="tel"
@@ -136,40 +188,62 @@ placeholder="Enter registered mobile number"
 required
 >
 <button class="btn gold">CHECK STATUS</button>
-</form><div id="statusResult" class="status-result" aria-live="polite"></div>
+</form>
+
+<div id="statusResult" class="status-result" aria-live="polite"></div>
 </div>
-</section><section class="section players-section" id="players">
+</section>
+
+<section class="section players-section" id="players">
+
 <div class="section-head">
 <div>
 <span class="kicker">THE OFFICIAL ROSTER</span>
 <h2>CONFIRMED <em>PLAYERS</em></h2>
 </div>
 <div class="count-pill"><strong id="rosterCount">0</strong> PLAYERS</div>
-</div><div id="playersGrid" class="players-grid">
+</div>
+
+<div id="playersGrid" class="players-grid">
 <div class="empty-state">Loading confirmed players…</div>
 </div>
-</section><section class="section" id="support">
+</section>
+
+<section class="section" id="support">
+
 <div class="section-head">
 <div>
 <span class="kicker">WE ARE HERE TO HELP</span>
 <h2>COMPLAINT & <em>SUPPORT</em></h2>
 </div>
 <p>Having a problem? Contact the DPL support group.</p>
-</div><div class="panel" style="max-width:850px;margin:0 auto;text-align:center;padding:35px 22px;">
-<div style="font-size:48px;margin-bottom:12px;">🛡️</div><h3 style="font-size:25px;margin-bottom:12px;">NEED HELP? WE ARE LISTENING.</h3><p style="line-height:1.8;margin-bottom:22px;">
+</div>
+
+<div class="panel" style="max-width:850px;margin:0 auto;text-align:center;padding:35px 22px;">
+
+<div style="font-size:48px;margin-bottom:12px;">🛡️</div>
+
+<h3 style="font-size:25px;margin-bottom:12px;">NEED HELP? WE ARE LISTENING.</h3>
+
+<p style="line-height:1.8;margin-bottom:22px;">
 अगर आपको DPL से जुड़ी कोई भी समस्या या शिकायत है,
 तो हमारे आधिकारिक WhatsApp Support Group में शामिल हों।
 वहाँ अपनी समस्या बताएं और सहायता प्राप्त करें।
-</p><div style="text-align:left;max-width:480px;margin:0 auto 25px;line-height:2;">
+</p>
+
+<div style="text-align:left;max-width:480px;margin:0 auto 25px;line-height:2;">
 <p>📌 Registration से जुड़ी शिकायत</p>
 <p>📌 ₹199 Payment से जुड़ी समस्या</p>
 <p>📌 Player List में नाम नहीं दिखना</p>
 <p>📌 Player Card से जुड़ी समस्या</p>
 <p>📌 Tournament से जुड़ी अन्य शिकायतें</p>
-</div><a href="https://chat.whatsapp.com/JS80xbfm6Yw1yurFmxZVmc?s=cl&p=a&iam=2"
+</div>
+
+<a href="https://chat.whatsapp.com/JS80xbfm6Yw1yurFmxZVmc?s=cl&p=a&iam=2"
 target="_blank" rel="noopener noreferrer"
 class="btn full"
 style="display:inline-flex;justify-content:center;align-items:center;max-width:380px;background:#25D366;color:#fff;text-decoration:none;padding:16px 24px;font-weight:800;">
+
 <span style="font-size:20px;margin-right:10px;">☏</span>
 JOIN DPL WHATSAPP SUPPORT
 </a>
@@ -177,97 +251,184 @@ JOIN DPL WHATSAPP SUPPORT
 <p style="font-size:12px;margin-top:18px;opacity:.75;">
 Please explain your problem clearly so the DPL team can assist you.
 </p>
+
 </div>
-</section><section class="closing">
+</section>
+
+<section class="closing">
 <img src="assets/dpl-logo.png" alt="DPL">
+
 <div>
 <span class="kicker">THE GAME IS OURS</span>
 <h2>MAKE YOUR <em>MARK.</em></h2>
 <p>Debodih Premier League • Debodih, Satgawan, Koderma, Jharkhand</p>
 </div>
+
 <a class="btn gold" href="#register">JOIN DPL →</a>
-</section></main><footer>
+</section>
+
+</main>
+
+<footer>
 <span>© 2026 Debodih Premier League</span>
 <span>OFFICIAL DPL REGISTRATION PORTAL</span>
 <button id="footerAdmin">Admin access</button>
-</footer><!-- PAYMENT MODAL --><div class="modal" id="paymentModal">
-<div class="modal-card"><button class="x" data-close="paymentModal">×</button>
+</footer>
+
+<!-- PAYMENT MODAL -->
+<div class="modal" id="paymentModal">
+<div class="modal-card">
+
+<button class="x" data-close="paymentModal">×</button>
 
 <span class="kicker">STEP 02 • COMPLETE PAYMENT</span>
 
-<h2>DPL <em>REGISTRATION FEE</em></h2><div style="text-align:center;margin:15px 0 20px;">
+<h2>DPL <em>REGISTRATION FEE</em></h2>
+
+<div style="text-align:center;margin:15px 0 20px;">
 <div style="font-size:36px;font-weight:800;color:#e8b83f;">₹199</div>
 <div style="font-size:13px;">ONE TIME REGISTRATION FEE</div>
-</div><!-- DIRECT UPI PAYMENT --><div style="text-align:center;margin-bottom:20px;">
-<h3 style="margin-bottom:10px;">PAY DIRECTLY USING UPI</h3><p style="margin-bottom:15px;">
+</div>
+
+<!-- DIRECT UPI PAYMENT -->
+<div style="text-align:center;margin-bottom:20px;">
+
+<h3 style="margin-bottom:10px;">PAY DIRECTLY USING UPI</h3>
+
+<p style="margin-bottom:15px;">
 नीचे दिए गए बटन पर टैप करें। PhonePe, Google Pay या दूसरे उपलब्ध UPI ऐप से ₹199 का पेमेंट करें।
-</p><a class="dpl-upi-button"
-href="upi://pay?pa=8252642021-3@axl&pn=Debodih%20Premier%20League&am=199&cu=INR&tn=DPL%20Registration"
+</p>
+
+<a class="dpl-upi-button"
+href="upi://pay?pa=8252642021-3@axl&am=199&cu=INR"
 style="display:flex;width:100%;max-width:350px;min-height:58px;margin:0 auto 15px;padding:16px;background:#25D366;color:#073b20;text-decoration:none;font-family:Inter,Arial,sans-serif;font-size:17px;font-weight:900;line-height:1.4;text-align:center;align-items:center;justify-content:center;border-radius:10px;box-sizing:border-box;">
+
 <span style="display:block!important;visibility:visible!important;opacity:1!important;color:#073b20!important;">
 📲 PAY ₹199 NOW
 </span>
-</a>
 
-</div><hr style="border:0;border-top:1px solid rgba(255,255,255,.15);margin:20px 0;"><!-- QR CODE --><div style="text-align:center;margin-bottom:12px;">
-<h3 style="margin-bottom:10px;">OR SCAN QR CODE</h3><p style="margin-bottom:15px;">
+</a>
+</div>
+
+<hr style="border:0;border-top:1px solid rgba(255,255,255,.15);margin:20px 0;">
+
+<!-- QR CODE -->
+<div style="text-align:center;margin-bottom:12px;">
+
+<h3 style="margin-bottom:10px;">OR SCAN QR CODE</h3>
+
+<p style="margin-bottom:15px;">
 दूसरे फोन से नीचे दिए गए QR Code को स्कैन करके भी पेमेंट कर सकते हैं।
-</p><div class="dpl-qr-box">
+</p>
+
+<div class="dpl-qr-box">
 <img src="assets/phonepe-qr.png" alt="DPL Payment QR Code">
-</div><div class="upi-line" style="margin:12px 0;">
+</div>
+
+<div class="upi-line" style="margin:12px 0;">
 <small>UPI ID</small>
 <b>8252642021-3@axl</b>
 </div>
-</div><hr style="border:0;border-top:1px solid rgba(255,255,255,.15);margin:20px 0;"><!-- PAYMENT SCREENSHOT UPLOAD --><h3 style="margin-bottom:12px;">UPLOAD PAYMENT SCREENSHOT</h3><p style="margin-bottom:15px;">
+</div>
+
+<hr style="border:0;border-top:1px solid rgba(255,255,255,.15);margin:20px 0;">
+
+<!-- PAYMENT SCREENSHOT UPLOAD -->
+<h3 style="margin-bottom:12px;">UPLOAD PAYMENT SCREENSHOT</h3>
+
+<p style="margin-bottom:15px;">
 पेमेंट पूरा होने के बाद उसका Screenshot अपलोड करके Registration Submit करें।
-</p><form id="paymentForm">
+</p>
+
+<form id="paymentForm">
+
 <label class="upload-box">
 <span class="upload-icon">＋</span>
 <b>Payment Screenshot</b>
 <small>JPG, PNG or WEBP • Maximum 5 MB</small>
 <input id="paymentFile" type="file" accept="image/jpeg,image/png,image/webp" required>
 <span id="paymentName" class="file-name">Choose screenshot</span>
-</label><button class="btn gold full" type="submit">SUBMIT REGISTRATION</button>
+</label>
 
-</form><div id="paymentMessage" aria-live="polite"></div>
+<button class="btn gold full" type="submit">SUBMIT REGISTRATION</button>
+
+</form>
+
+<div id="paymentMessage" aria-live="polite"></div>
+
 </div>
-</div><!-- ADMIN MODAL --><div class="modal" id="adminModal">
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="modal" id="adminModal">
 <div class="modal-card admin-modal">
-<button class="x" data-close="adminModal">×</button><div id="adminLogin">
+
+<button class="x" data-close="adminModal">×</button>
+
+<div id="adminLogin">
+
 <span class="kicker">RESTRICTED AREA</span>
-<h2>DPL <em>ADMIN LOGIN</em></h2><form id="loginForm">
+<h2>DPL <em>ADMIN LOGIN</em></h2>
+
+<form id="loginForm">
+
 <label>Email
 <input name="email" type="email" autocomplete="username" required>
 </label>
+
 <label>Password
 <input name="password" type="password" autocomplete="current-password" required>
 </label>
+
 <button class="btn gold full">LOGIN TO DASHBOARD</button>
-</form><p class="fineprint">Only authorized DPL administrators can access this panel.</p>
-</div><div id="adminDashboard" hidden>
+</form>
+
+<p class="fineprint">Only authorized DPL administrators can access this panel.</p>
+</div>
+
+<div id="adminDashboard" hidden>
+
 <div class="admin-head">
 <div>
 <span class="kicker">CONTROL ROOM</span>
 <h2>ADMIN <em>DASHBOARD</em></h2>
 </div>
 <button id="logoutBtn" class="btn outline">LOG OUT</button>
-</div><div class="admin-stats">
+</div>
+
+<div class="admin-stats">
 <div><b id="adminTotal">0</b><small>CONFIRMED</small></div>
 <div><b id="adminPending">0</b><small>PENDING</small></div>
 <div><b id="adminCollection">₹0</b><small>APPROVED FEES</small></div>
-</div><div class="admin-tools">
+</div>
+
+<div class="admin-tools">
 <h3>REGISTRATION REQUESTS</h3>
 <button class="btn outline" id="exportBtn">DOWNLOAD CSV</button>
-</div><div id="adminList" class="admin-list">Loading…</div>
+</div>
+
+<div id="adminList" class="admin-list">Loading…</div>
+</div>
+
 </div>
 </div>
-</div><!-- PLAYER CARD MODAL --><div class="modal" id="cardModal">
+
+<!-- PLAYER CARD MODAL -->
+<div class="modal" id="cardModal">
 <div class="modal-card card-modal">
+
 <button class="x" data-close="cardModal">×</button>
+
 <div id="playerCard" class="player-card"></div>
+
 <button id="downloadCard" class="btn gold full">DOWNLOAD PLAYER CARD ↓</button>
 </div>
-</div><div class="toast" id="toast" role="status"></div><!-- TEMPORARY ERROR DIAGNOSTIC --><script>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<!-- TEMPORARY ERROR DIAGNOSTIC -->
+<script>
 window.addEventListener('error', function(e) {
   const box = document.createElement('div');
   box.style = 'position:fixed;bottom:10px;left:10px;right:10px;background:#7f0000;color:white;padding:15px;z-index:999999;font-size:14px;overflow-wrap:anywhere;';
@@ -281,7 +442,10 @@ window.addEventListener('unhandledrejection', function(e) {
   box.textContent = 'DPL ERROR: ' + (e.reason?.message || String(e.reason));
   document.body.appendChild(box);
 });
-</script><!-- PAYMENT MODAL DISPLAY FIX --><style>
+</script>
+
+<!-- PAYMENT MODAL DISPLAY FIX -->
+<style>
 #paymentModal {
   padding: 10px;
   overflow-x: hidden;
@@ -351,5 +515,7 @@ window.addEventListener('unhandledrejection', function(e) {
     max-width: 100%;
   }
 }
-</style></body>
+</style>
+
+</body>
 </html>
